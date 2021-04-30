@@ -39,6 +39,8 @@ s.send(request.encode())
 
 data = s.recv(4096)
 
+print(f"Size: {len(data)}")
+
 print("Data", str(bytes(data)))
 print("Length", len(data))
 

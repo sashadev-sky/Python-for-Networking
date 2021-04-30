@@ -41,15 +41,14 @@ from socket import (AF_INET, SO_REUSEPORT, SOCK_STREAM, SOL_SOCKET,
 
 ### Creating a Socket
 
-
 In a **client-server architecture**, there is a central server that provides services to a set of machines that connect to it.
 
 A server *must* perform the sequence
 
 1. [**`socket()`**](#socket())
-2. **`bind()`**
+2. [**`bind()`**](#bind())
 3. **`listen()`**
-4. **`accept()`** (possibly repeating the `accept()` to service more than one client)
+4. [**`accept()`**](#accept()) (possibly repeating the `accept()` to service more than one client)
 
 While a client only needs the sequence
 
@@ -61,11 +60,15 @@ While a client only needs the sequence
 ### socket()
 
 ```python
-socket(family=AF_INET, type=SOCK_STREAM, proto=0) -> socket
-"""
+socket(family=AF_INET, type=SOCK_STREAM, proto: int=0) -> socket
+socket(family=-1, type=-1, proto=-1, fileno: int=None) -> socket
+"""Open a socket of the given type.
+
 :param family: socket domains defined on AddressFamily
-:param type: socket types defined on SocketKind
-:param proto: int
+:param type: socket types defined on SocketKind. Stream (SOCK_STREAM) or datagram (SOCK_DGRAM) socket.
+:param proto: protocol
+:param fileno: when passed, family, type and proto are auto-detected, unless they are explicitly set.
+:return: one endpoint of a network connection
 """
 ```
 
@@ -74,11 +77,10 @@ socket(family=AF_INET, type=SOCK_STREAM, proto=0) -> socket
 ```python
 connect(address: tuple[str, int])
 """
-:param address: A pair (host, port) is used for the AF_INET
-    address family, where host is a string representing
-    either a hostname in Internet domain notation like
-    'daring.cwi.nl' or an IPv4 address like '100.50.200
-    5', and port is an integer.
+:param address: A pair (host, port) is used for the AF_INET address family,
+                where host is a string representing either a hostname in
+                Internet domain notation like 'daring.cwi.nl' or an IPv4
+                address like '100.50.2005', and port is an integer.
 """
 ```
 
@@ -101,6 +103,27 @@ Note: of the socket after it `connect`s,
 * The local port is dynamically assigned
 * The remote ip address is the ip address of the client's web server
 * The remote host is the port the server is listening on
+
+### accept()
+
+```python
+accept() -> tuple
+"""Accept connection, returning new socket fd and client address.
+
+Enables us to accept client connections and returns a tuple with
+two values that represent client_socket and client_address. You
+need to call the socket.bind() and socket.listen() methods
+before using this method.
+
+"""
+```
+
+### bind()
+
+```python
+bind(addr)
+"""Bind the socket to a local address."""
+```
 
 ## Using a Socket
 
