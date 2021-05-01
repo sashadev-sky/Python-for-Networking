@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 from socket import (AF_INET, SO_REUSEPORT, SOCK_STREAM, SOL_SOCKET,
                     create_server, socket)
 
@@ -9,12 +12,35 @@ from socket import (AF_INET, SO_REUSEPORT, SOCK_STREAM, SOL_SOCKET,
 # serversocket = socket()
 
 """
+`print(f'socket: {repr(serversocket)}')`
+`socket: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>`
+"""
+
+"""
 To set a socket option do it right before `bind`:
     `serversocket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)`
 """
 
 # serversocket.bind(('localhost', 8080))
+
+"""
+passing 'localhost' means only localhost can connect to this port
+`print(f'bind: {repr(serversocket)}')`
+`bind: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080)>`
+
+Note: pass an empty string for ip to make the port available to connect for everyone
+`serversocket.bind(('', 8080))`
+`print(f'bind: {repr(serversocket)}')`
+`bind: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 8080)>`
+
+Note: Port 0 means to select an arbitrary unused port
+`serversocket.bind(('localhost', 0))`
+`print(f'bind: {repr(serversocket)}')`
+`bind: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 61510)>`
+"""
+
 # serversocket.listen(5)
+
 
 """
 The resulting socket obj created:
@@ -75,14 +101,14 @@ with create_server(('localhost', 8080), backlog=5) as serversocket:
     while True:
         print('Waiting for connections')
         clientsocket, addr = serversocket.accept()
+        # accept: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080)>
+        print(f'accept: {repr(serversocket)}')
         # handle new connection
         with clientsocket:
-            print('Connected by', addr)
-            print('HTTP request received:')
-            print(clientsocket.recv(1024))
+            print('Connected by', addr)  # Connected by ('127.0.0.1', 61442)
+            print(f'HTTP request received: {clientsocket.recv(1024)}')  # b'GET / HTTP/1.1\r\nHost: localhost\r\n\r\n'
             clientsocket.send(bytes(
                 "HTTP/1.1 200 OK\r\n\r\n <html><body><h1>Hello World!</h1></body></html> \r\n", 'utf-8'))
-
 
 """
 $ p3 http_server.py

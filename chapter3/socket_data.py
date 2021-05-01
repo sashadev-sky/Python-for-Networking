@@ -11,8 +11,7 @@ s = socket()
 print(f'socket created: {repr(s)}')
 print("connection with remote host")
 
-target_host = "www.google.com"
-target_port = 80
+target_host, target_port = "www.google.com", 80
 
 """
 If we were to plug in a port that is not accepting connections
@@ -39,12 +38,11 @@ s.send(request.encode())
 
 data = s.recv(4096)
 
-print(f"Size: {len(data)}")
-
 print("Data", str(bytes(data)))
 print("Length", len(data))
 
 print('closing the socket')
+
 s.close()
 
 """
