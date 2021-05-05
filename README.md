@@ -4,7 +4,7 @@
 
 ### TCP vs. HTTP
 
-> TCP is to HTTP as gasoline is to cars.
+>TCP is to HTTP as gasoline is to cars.
 
 Ex. while im on stackoverflow in my browser and run `$ netstat`:
 
@@ -53,7 +53,7 @@ While the original socket continues to listen for incoming connections (status: 
   * Formally called a **passive** socket
 
 * The **client application** (your browser, for example) **uses “client” sockets exclusively**.
-  * It will be implemented as a Python **`socket` client** that `connect`s to a remote host, `send`s it a request or command and `recv`s the response data.
+  * It will be implemented as a Python **`socket` client** that **`connect`** s to a remote host, **`send`** s it a request or command and **`recv`** s the response data.
 
 * The **web server** it’s talking to **uses both “server” sockets and “client” sockets**.
 
@@ -86,7 +86,6 @@ Type | Constant | Notes
 **TCP** | `SOCK_STREAM` | You’ll get better behavior and performance from a STREAM socket than anything else.
 **UDP** | `SOCK_DGRAM` |
 
-
 ### Family
 
 Sockets can also be categorized by **family**. We will focus on the following two:
@@ -95,6 +94,80 @@ Type | Constant | Notes
 --- | --- | ---
 **IPv4** | `AF_INET` | Account for at least 99% of the sockets in use. <br><br> A pair (host, port) is used, with **host** as: <ul><li>A hostname in Internet domain notation like 'daring.cwi.nl'</li><li>An IPv4 address like '100.50.200.5'
 **IPv6** | `AF_INET6` |
+
+## Socket Methods
+
+* [**`gethostname()`**](#gethostname())
+
+* [**`gethostbyname()`**](#gethostbyname())
+
+* [**`gethostbyaddr()`**](#gethostbyaddr())
+
+### gethostname()
+
+```python
+gethostname() -> str
+"""
+Return the current host name.
+"""
+```
+
+You can get this value by running **`hostname`** in your console:
+
+```bash
+$ hostname
+Locals-MBP.fios-router.home
+```
+
+#### **Direct DNS Resolution**
+
+> When binding a socket to listen to `hostname`, it will in turn be resolved to an IP address.
+
+### gethostbyname()
+
+```python
+gethostbyname(hostname: str) -> str
+"""Return the IP address(a string of the form '255.255.255.255') for a host."""
+```
+
+You can get this value by running **`ping <hostname>`** in your console:
+
+```bash
+$ ping Locals-MBP.fios-router.home
+PING locals-mbp.fios-router.home (192.168.1.246): 56 data bytes
+
+$ ping www.google.com
+PING www.google.com (172.217.3.100): 56 data bytes
+```
+
+#### Why is `ping` and `gethostbyname` resolving to an IP 92.242.140.21 for any random hostname that I type?
+
+```bash
+$ ping madeupnameblag
+PING madeupnameblag (92.242.140.21): 56 data bytes
+```
+
+* Because your ISP is hijacking your DNS queries.
+
+* They are trying to be "helpful" by redirecting requests for nonexistent domains to a white label service that provides search results and advertising, from which everyone but you gets a cut of the revenue.
+  * For example, searchassist.verizon.com
+
+* Your DNS instead should be returning error & failing the request. Fortunately, your ISP should have a preferences page where you can supposedly turn it off.
+* Another solution is to [consider using a 3rd party DNS service](https://www.howtogeek.com/167239/7-reasons-to-use-a-third-party-dns-service/).
+
+### gethostbyaddr()
+
+#### Reverse resolution
+
+> Allows us to associate a domain name with a specific IP address.
+
+```python
+gethostbyaddr(host: str) -> (name, alias: list, address: list)
+"""Return the true host name, a list of aliases, and a list of IP addresses, for a host.
+
+:param host: host name or IP number
+"""
+```
 
 ### Creating a Socket
 
@@ -106,15 +179,17 @@ A server *must* perform the sequence
 4. [**`accept()`**](#accept()) (possibly repeating the `accept()` to service more than one client)
 
 * **Note**: 1-3 may be replaced by [**`create_server()`**](#create_server)
-* See [http_server.py](./chapter3/http_server/http_server.py)
+
+[http_server.py](./chapter3/http_server/http_server.py)
 
 While a client only needs the sequence
 
 1. [**`socket()`**](#socket())
 2. [**`connect()`**](#connect()) or [**`connect_ex()`**](#connect_ex())
 
-* **Note**: 1-2 may be replaced by **`create_connection`**
-* See [socket_data.py]((./chapter3/socket_data.py))
+* **Note**: 1-2 may be replaced by [**`create_connection()`**](#create_connection())
+
+[socket_data.py]((./chapter3/socket_data.py))
 
 **Note**: both implementations can make use of **`settimeout`**. See [Timeout Notes](#Timeout-Notes).
 
@@ -123,7 +198,7 @@ While a client only needs the sequence
 Status | Local Address (`laddr`) | Remote Address (`raddr`) |
 --- | --- | --- |
 Before `bind` | zero (`0.0.0.0:0`), no connection. | N/A
-After `bind` | ex. `0.0.0.0:8080` (everyone on IPv4 interface) <br> ex2. `127.0.0.1:8080` (localhost) <ul><li><b>ip</b>: your web server's ip</li><li><b>port</b>: your web server's port</li></ul>A TCP server (such as a web server process) <b><i>listens</b></i> on a local port. Here, the local address only controls who can connect to this port: everyone, or only connections from localhost. | N/A
+After `bind` | ex. `0.0.0.0:8080` (everyone on IPv4 interface) <br> ex2. `127.0.0.1:8080` (localhost) <br> ex3. `192.168.1.246:8080` (public ip) <ul><li><b>ip</b>: your web server's ip</li><li><b>port</b>: your web server's port</li></ul>A TCP server (such as a web server process) <b><i>listens</b></i> on a local port. Here, the local address only controls who can connect to this port: everyone, or only connections from localhost. | N/A
 After `listen` | No change | N/A
 After `accept` | No change <br><br> `accept` returns a new socket to handle the connection while this one just keeps on listening. | N/A
 
@@ -138,7 +213,7 @@ After `connect` | ex. `192.168.1.246:50679`<ul><li><b>ip</b>: internal ip of you
 
 ### socket()
 
-**socket server** and **socketclient** method (used the same for both)
+**socket server** and **socket client** method (used the same for both)
 
 Create a new socket object.
 
@@ -170,10 +245,7 @@ ss = socket()  # <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketK
 connect(addr: tuple[str, int]) -> None
 """Connects the client to the server IP address.
 
-:param addr: A pair (host, port) is used for the AF_INET address family,
-             where host is a string representing either a hostname in
-             Internet domain notation like 'daring.cwi.nl' or an IPv4
-             address like '100.50.2005', and port is an integer.
+:param addr: A pair (host, port).
 """
 ```
 
@@ -187,6 +259,12 @@ s = socket()  # <... laddr=('0.0.0.0', 0)>
 s.connect(("www.python.org", 80))
 # <... laddr=('192.168.1.246', 50679), raddr=('142.250.64.68', 80)>
 ```
+
+As discussed under [gethostbyname()](#gethostbyname()), `connect` will **not fail even if the host is not a real existing host** because of your ISPs DNS resolution. It will even allow you to `send` and `recv` data.
+
+* You can test this out by passing a random host to `target_host` in [socket_data.py](./chapter3/http_server/testing_http_server.py).
+
+However, **it will hang after `connect` until a timeout if the port is not accepting connections** (a random host will probably fail if you change your port from 80 to something non-standard).
 
 ### connect_ex()
 
@@ -212,6 +290,15 @@ Useful for:
   * If you try to use `connect` with `setblocking(False)`, you will raise an exception `BlockingIOError: [Errno 36] Operation now in progress`
   * But if you use `connect_ex`, you will just return 36
 
+### create_connection()
+
+**socket client** method
+
+```python
+create_connection: (addr: Tuple[str | None, int], timeout: float | None, source_address: Tuple[bytearray | bytes | str, int] | None) -> socket
+"""Connect to *addr* and return the socket object."""
+```
+
 ### bind()
 
 **socket server** method
@@ -230,7 +317,7 @@ The socket must be open before establishing the connection with the address.
 
 **For host, passing**:
 
-1) 'localhost' means only localhost can connect to this port
+1) 'localhost' means only localhost (this machine) can connect to this port
 
 ```python
 ss.bind(('localhost', 8080))
@@ -242,6 +329,13 @@ ss.bind(('localhost', 8080))
 ```python
 ss.bind(('', 8080))
 # <... laddr=('0.0.0.0', 8080)>
+```
+
+3) A specific IP address, as resolved from the result of **`gethostname()`**, will only accept connections to the associated interface. (A connection made must be made to the resolved IP)
+
+```python
+ss.bind((gethostname(), 8080))
+# <... laddr=('192.168.1.246', 8080)
 ```
 
 **For port, passing**:
@@ -352,7 +446,7 @@ The Firefox browser created a socket to `connect()` to the server. Firefox uses 
 
 ## Using a Socket
 
-These are the general socket methods we can use in both clients and servers:
+These are the general socket methods we can use in both socket clients and servers:
 
 **TCP communication**:
 
@@ -363,6 +457,15 @@ These are the general socket methods we can use in both clients and servers:
 
 * **`sendto(data, addr)`**: Sends data to a given address.
 * **`recvfrom(bufsize)`**: This method receives data and the sender's address.
+
+### send()
+
+```python
+send(data: bytes) -> bytes
+"""Sends bytes of data to the specified target."""
+```
+
+Use **`encode`** to convert to bytes: `str.encode(encoding: str='UTF-8') -> bytes`
 
 ### recv()
 
@@ -381,16 +484,54 @@ It is a blocking call - blocking if no data is waiting to be read.
 
 * Note: for best match with hardware and network realities, the value of `bufsize` should be relatively small (commonly, power of 2), for example, 4096.
 
-### send()
+Use **`decode`** to convert the `recv`'d data from bytes when you know the encoding: `bytes.decode(encoding: str='UTF-8') -> str`
+
+## Basic socket client with the `socket` module
+
+> **Normally, the *connecting* socket starts the conversation, by sending in a request**, or perhaps a signon. But that’s a design decision - it’s not a rule of sockets.
+
+1) When the **`connect`** completes
+2) The socket can be used to **`send`** in a request for the text of the page.
+3) The same socket will read the reply (**`recv`**)
+4) And then be destroyed (**`close`**).
+    * That’s right, destroyed. Client sockets are normally only used for one exchange (or a small set of sequential exchanges).
+       * (Like the multiple commands we send from a command struct to the `watchout_client`)
+
+[`socket_data.py`](./chapter3/http_server/testing_http_server.py)
+
+## HTTP server in Python with the `socket` module
+
+After marking our socket as a "server" socket with `listen`, we enter the mainloop of the server.
+Here, we are establishing the logic of our server every time it receives a request from a client:
+
+1) **`Accept`** the connection
+2) Spawns a new socket to communicate directly with the newly connected client. (First instance of two-way communications between them). Allows other clients to connect.
+    * The loop, often a simple **`while True`**, keeps the "server" socket listening. Without it, it would disconnect after the first client request.
 
 ```python
-send(data: bytes) -> bytes
-"""Sends bytes of data to the specified target."""
-```
+while True:
+    # accept connections from outside
+    (clientsocket, clientaddr) = ss.accept()
+    # now do something with the clientsocket
+    # in this case, we'll pretend this is a threaded server
+    ct = client_thread(clientsocket)
+    ct.run()
+  ```
 
-### Basic client with the `socket` module
+There’s actually 3 general ways in which this loop could work:
 
-Once the connection is established, we can send and receive data using:
+1) Dispatching a thread to handle clientsocket
+2) Create a new process to handle clientsocket
+3) Restructure this app to use non-blocking sockets, and multiplex between our “server” socket and any active "client" sockets using select.
+
+#### The important thing to understand now is this: this is all a “server” socket does.
+
+* It doesn’t send any data.
+* It doesn’t receive any data.
+* It just produces “client” sockets.
+  * **Each clientsocket is created in response to some other “client” socket doing a `connect()` to the host and port we’re bound to**.
+  * As soon as we’ve created that clientsocket, we go back to listening for more connections.
+  * The two “clients” are free to chat it up - they are using some dynamically allocated port which will be recycled when the conversation ends.
 
 ## Timeout Notes
 
@@ -419,6 +560,30 @@ or using **`create_connection`**:
 ```python
 s = create_connection((target_host, target_port), timeout=2.0)
 ```
+
+**Without a timeout**: timeout eventually occurs with exception **`TimeoutError: [Errno 60] Operation timed out.`**
+
+**With a timeout**: timeout occurs after the set number of seconds with exception **`socket.timeout: timed out`**.
+
+### We can map errors to their standard `errno` system symbols:
+
+```python
+import errno
+
+sock = socket()
+sock.settimeout(5)
+result = sock.connect_ex((ip, port))
+if result == 0:
+    print(f"Port {port}: \t Open")
+else:
+    print (f"Port {port}: \t Closed")
+    print("Reason:", errno.errorcode[result])
+sock.close()
+```
+
+**without a timeout**: result = 60, Reason: **`ETIMEDOUT`** (Device not a stream).
+
+**With a timeout**: result = 35, Reason: **`EAGAIN`**, meaning a receive timeout had been set, and the timeout expired before data were received. (Resource deadlock avoided).
 
 ### Timeouts and the `accept` method
 
