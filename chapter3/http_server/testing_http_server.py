@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from socket import socket
 
-webhost, webport = 'localhost', 8080
+webhost, webport = '', 8080
 print("Contacting %s on port %d ..." % (webhost, webport))
 webclient = socket()
 webclient.connect((webhost, webport))

@@ -29,14 +29,11 @@ The resulting socket obj created:
 * Alterantive way: 'create_server'
 """
 
-"""
-* if we removed 'while True', socketserver would disconnect after the request (opening browser window at addr)
-"""
-
 # with create_server(('localhost', 8080)) as serversocket:
     # while True:
     #     print('Waiting for connections')
-    #     clientsocket, address = serversocket.accept()
+    #     clientsocket, clientadd = serversocket.accept()
+    #     clientsocket.settimeout(2.0)
     #     # handle new connection
     #     print('HTTP request received:')
     #     print(clientsocket.recv(1024))
@@ -52,13 +49,13 @@ with create_server(('localhost', 8080)) as serversocket:
     print(repr(serversocket))  # <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080)>
     while True:
         print('Waiting for connections')
-        clientsocket, addr = serversocket.accept()
+        clientsocket, clientaddr = serversocket.accept()
         print(f'accept: {repr(serversocket)}')  # accept: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080)>
         print(f'{repr(clientsocket)}')  # <socket.socket fd=6, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080), raddr=('127.0.0.1', 56416)>
-        # handle new connection
         clientsocket.settimeout(2.0)
+        # handle new connection
         with clientsocket:
-            print('Connected by', addr)  # Connected by ('127.0.0.1', 56416)
+            print('Connected by', clientaddr)  # Connected by ('127.0.0.1', 56416)
             print(f'HTTP request received: {clientsocket.recv(1024)}')  # b'GET / HTTP/1.1\r\nHost: localhost\r\n\r\n'
             clientsocket.send(bytes(
                 "HTTP/1.1 200 OK\r\n\r\n <html><body><h1>Hello World!</h1></body></html> \r\n", 'utf-8'))
@@ -75,14 +72,4 @@ b'GET / HTTP/1.1\r\nHost: localhost:8080\r\nConnection: keep-alive\r\nsec-ch-ua:
 
 * Refreshing the page or reopening it in a new tab resends everything with a new client connection each time. Closing the browser
 * does not close the server.
-"""
-
-"""
-!The important thing to understand is this: this is all a “server” socket does.
-* It doesn’t send any data.
-* It doesn’t receive any data.
-* It just produces “client” sockets.
-    * Each clientsocket is created in response to some other “client” socket doing a connect() to the host and port we’re bound to.
-    * As soon as we’ve created that clientsocket, we go back to listening for more connections.
-    * The 2 “clients” are free to chat it up - they r using some dynamically allocated port which will be recycled when the conversation ends.
 """
