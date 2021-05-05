@@ -1,24 +1,18 @@
 #!/usr/bin/env python3
 
-from socket import AF_INET, SOCK_STREAM, socket
+from socket import socket
 
 ip = '127.0.0.1'
 portlist = [21, 22, 23, 80]
 for port in portlist:
-	# sock = socket(AF_INET, SOCK_STREAM)
 	sock = socket()
 	result = sock.connect_ex((ip, port))
 	print(port, ":", result)
 	sock.close()
 
 """
-script shows ports that are open in the localhost machine
-with the loopback IP address interface of 127.0.0.1.
-
-checks ports for ftp, ssh, telnet, and http services
+Checks ports for ftp, ssh, telnet, and http services
 in the localhost interface.
-
-'connect_ex' returns 0 if connects, otherwise returns an error code
 
 error code 61: ECONNREFUSED Connect	The requested connection was refused. Ensure server application is available and at specified port.
 

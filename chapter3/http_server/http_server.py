@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-from socket import (AF_INET, SO_REUSEPORT, SOCK_STREAM, SOL_SOCKET,
+from socket import (AF_INET, SO_REUSEPORT, SOCK_STREAM, SOL_SOCKET, SOMAXCONN,
                     create_server, socket)
 
 
@@ -39,8 +39,7 @@ Note: Port 0 means to select an arbitrary unused port
 `bind: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 61510)>`
 """
 
-# serversocket.listen(5)
-
+# serversocket.listen()
 
 """
 The resulting socket obj created:
@@ -51,6 +50,9 @@ The resulting socket obj created:
     - 'serversocket.family' -> <AddressFamily.AF_INET: 2>
     - 'serversocket.type' -> <SocketKind.SOCK_STREAM: 1>
     - 'serversocket.proto' -> 0
+
+The default value for `backlog` for listen is currently 128 (platform dependent)
+`print(SOMAXCONN) -> 128`
 """
 
 """
@@ -81,21 +83,21 @@ or
 """
 
 # with create_server(('localhost', 8080), backlog=5) as serversocket:
-#     while True:
-#         print('Waiting for connections')
-#         clientsocket, address = serversocket.accept()
-#         # handle new connection
-#         print('HTTP request received:')
-#         print(clientsocket.recv(1024))
-#         clientsocket.send(bytes(
-#             "HTTP/1.1 200 OK\r\n\r\n <html><body><h1>Hello World!</h1></body></html> \r\n", 'utf-8'))
-#         clientsocket.close()
+    # while True:
+    #     print('Waiting for connections')
+    #     clientsocket, address = serversocket.accept()
+    #     # handle new connection
+    #     print('HTTP request received:')
+    #     print(clientsocket.recv(1024))
+    #     clientsocket.send(bytes(
+    #         "HTTP/1.1 200 OK\r\n\r\n <html><body><h1>Hello World!</h1></body></html> \r\n", 'utf-8'))
+    #     clientsocket.close()
 
 """
 Refactored a 3rd time - use a client context manager too
 """
 
-with create_server(('localhost', 8080), backlog=5) as serversocket:
+with create_server(('localhost', 8080)) as serversocket:
     # <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080)>
     print(repr(serversocket))
     while True:

@@ -3,10 +3,9 @@
 
 # 1. Create a socket object with the AF_INET and SOCK_STREAM parameters:
 
-from socket import AF_INET, SOCK_STREAM, socket
+from socket import AF_INET, SOCK_STREAM, socket, TCP_USER_TIMEOUT
 
 print('creating socket ...')
-# s = socket(AF_INET, SOCK_STREAM)
 s = socket()
 print(f'socket created: {repr(s)}')
 print("connection with remote host")
@@ -16,10 +15,12 @@ target_host, target_port = "www.google.com", 80
 """
 If we were to plug in a port that is not accepting connections
 for example just pick a random port number that is not a classic like 80,
-the script will hang and we will never hit 'connection ok'.
+the script will hang and then eventually timeout with exception
+TimeoutError: [Errno 60] Operation timed out.
 """
 
-s.connect((target_host, target_port))
+print(f'{TCP_USER_TIMEOUT=}')
+s.connect_ex((target_host, target_port))
 print(f'connection ok: {repr(s)}')
 
 # 2. Then connect the client to the remote host and send it some data:
