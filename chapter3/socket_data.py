@@ -3,12 +3,12 @@
 
 # 1. Create a socket object with the AF_INET and SOCK_STREAM parameters:
 
-from socket import AF_INET, SOCK_STREAM, socket, TCP_USER_TIMEOUT
+from socket import socket, create_connection
 
 print('creating socket ...')
-s = socket()
-print(f'socket created: {repr(s)}')
-print("connection with remote host")
+# s = socket()
+# print(f'socket created: {repr(s)}')
+# print("connection with remote host")
 
 target_host, target_port = "www.google.com", 80
 
@@ -18,10 +18,15 @@ for example just pick a random port number that is not a classic like 80,
 the script will hang and then eventually timeout with exception
 TimeoutError: [Errno 60] Operation timed out.
 """
+# s.settimeout(2.0)
+# s.connect((target_host, target_port))
 
-print(f'{TCP_USER_TIMEOUT=}')
-s.connect_ex((target_host, target_port))
+# 2nd way
+
+s = create_connection((target_host, target_port), timeout=2.0)
+
 print(f'connection ok: {repr(s)}')
+
 
 # 2. Then connect the client to the remote host and send it some data:
 
@@ -30,6 +35,8 @@ request = "GET / HTTP/1.1\r\nHost:%s\r\n\r\n" % target_host
 # The encode() method encodes the string, using the specified encoding.
 # If no encoding is specified, UTF-8 will be used.
 
+# When the connect completes, the socket can be used to send in a request for the text of the page.
+
 s.send(request.encode())
 
 # 3. The last step is to receive some data back and print out the response:
@@ -37,13 +44,15 @@ s.send(request.encode())
 # Using the recv() method from the socket object to receive
 # the response from the server in the data variable.
 
+# The same socket will read the reply, and then be destroyed.
+# That’s right, destroyed. Client sockets are normally only used for one exchange (or a small set of sequential exchanges).
+
 data = s.recv(4096)
 
-print("Data", str(bytes(data)))
+print("Data", data.decode())
 print("Length", len(data))
 
 print('closing the socket')
-
 s.close()
 
 """

@@ -1,88 +1,39 @@
 #!/usr/bin/env python3
 
 
-from socket import (AF_INET, SO_REUSEPORT, SOCK_STREAM, SOL_SOCKET, SOMAXCONN,
+from socket import (SO_REUSEPORT, SOL_SOCKET,
                     create_server, socket)
 
-
-"""
-`socket(family=AF_INET, type=SOCK_STREAM, proto=0)`
-"""
-
-# serversocket = socket()
-
-"""
-`print(f'socket: {repr(serversocket)}')`
-`socket: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>`
-"""
+# ss = socket()
 
 """
 To set a socket option do it right before `bind`:
-    `serversocket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)`
+    `ss.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)`
 """
 
-# serversocket.bind(('localhost', 8080))
+# ss.bind(('localhost', 8080))
 
-"""
-passing 'localhost' means only localhost can connect to this port
-`print(f'bind: {repr(serversocket)}')`
-`bind: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080)>`
-
-Note: pass an empty string for ip to make the port available to connect for everyone
-`serversocket.bind(('', 8080))`
-`print(f'bind: {repr(serversocket)}')`
-`bind: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 8080)>`
-
-Note: Port 0 means to select an arbitrary unused port
-`serversocket.bind(('localhost', 0))`
-`print(f'bind: {repr(serversocket)}')`
-`bind: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 61510)>`
-"""
-
-# serversocket.listen()
+# ss.listen()
 
 """
 The resulting socket obj created:
     - does not have 'timeout' enabled (-> None) ('timeout' attribute or 'gettimeout()' method)
     - 'socket.SO_REUSEADDR' is set to 4 (Remote Port)
     - 'socket.SO_REUSEPORT' is set to 512
-    - 'serversocket.fileno()' -> 4
-    - 'serversocket.family' -> <AddressFamily.AF_INET: 2>
-    - 'serversocket.type' -> <SocketKind.SOCK_STREAM: 1>
-    - 'serversocket.proto' -> 0
-
-The default value for `backlog` for listen is currently 128 (platform dependent)
-`print(SOMAXCONN) -> 128`
+    - 'ss.fileno()' -> 4
+    - 'ss.family' -> <AddressFamily.AF_INET: 2>
+    - 'ss.type' -> <SocketKind.SOCK_STREAM: 1>
 """
 
 """
 * Alterantive way: 'create_server'
-
-Convenience function which creates a TCP socket bound to address (a 2-tuple (host, port)) and return the socket object.
-
-    * combines 'socket', 'setsockopt', 'bind' and 'listen'
-
-`create_server(addr, family=AF_INET, backlog=None, reuse_port=False, dualstack_ipv6=False) -> socket
-    `@addr
-        what we pass to `bind`
-    `@backlog
-        what we pass to `listen`
-    `@reuse_port
-        dictates whether to use the SO_REUSEPORT socket option. True is same as `serversocket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)`
-    `@dualstack_ipv6
-        If true and the platform supports it, create an AF_INET6 socketable to accept both IPv4 or IPv6 connections.
-        When false it will explicitly disable this option on platforms that enable it by default (e.g. Linux).
-
-`serversocket = create_server(('localhost', 8080), backlog=5)`
-or
-`with create_server(('localhost', 8080), backlog=5) as serversocket:`
 """
 
 """
 * if we removed 'while True', socketserver would disconnect after the request (opening browser window at addr)
 """
 
-# with create_server(('localhost', 8080), backlog=5) as serversocket:
+# with create_server(('localhost', 8080)) as serversocket:
     # while True:
     #     print('Waiting for connections')
     #     clientsocket, address = serversocket.accept()
@@ -98,16 +49,16 @@ Refactored a 3rd time - use a client context manager too
 """
 
 with create_server(('localhost', 8080)) as serversocket:
-    # <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080)>
-    print(repr(serversocket))
+    print(repr(serversocket))  # <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080)>
     while True:
         print('Waiting for connections')
         clientsocket, addr = serversocket.accept()
-        # accept: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080)>
-        print(f'accept: {repr(serversocket)}')
+        print(f'accept: {repr(serversocket)}')  # accept: <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080)>
+        print(f'{repr(clientsocket)}')  # <socket.socket fd=6, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('127.0.0.1', 8080), raddr=('127.0.0.1', 56416)>
         # handle new connection
+        clientsocket.settimeout(2.0)
         with clientsocket:
-            print('Connected by', addr)  # Connected by ('127.0.0.1', 61442)
+            print('Connected by', addr)  # Connected by ('127.0.0.1', 56416)
             print(f'HTTP request received: {clientsocket.recv(1024)}')  # b'GET / HTTP/1.1\r\nHost: localhost\r\n\r\n'
             clientsocket.send(bytes(
                 "HTTP/1.1 200 OK\r\n\r\n <html><body><h1>Hello World!</h1></body></html> \r\n", 'utf-8'))
