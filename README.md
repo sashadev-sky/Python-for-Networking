@@ -6,7 +6,7 @@
 
 >TCP is to HTTP as gasoline is to cars.
 
-Ex. while im on stackoverflow in my browser and run `$ netstat`:
+Ex. while i'm on stackoverflow in my browser and run `$ netstat`:
 
 ```bash
 Proto Recv-Q Send-Q  Local Address          Foreign Address        (state)
@@ -97,11 +97,11 @@ Type | Constant | Notes
 
 ## Socket Methods
 
-* [**`gethostname()`**](#gethostname())
+* [**`gethostname()`**](#gethostname)
 
-* [**`gethostbyname()`**](#gethostbyname())
+* [**`gethostbyname()`**](#gethostbyname)
 
-* [**`gethostbyaddr()`**](#gethostbyaddr())
+* [**`gethostbyaddr()`**](#gethostbyaddr)
 
 ### gethostname()
 
@@ -173,10 +173,10 @@ gethostbyaddr(host: str) -> (name, alias: list, address: list)
 
 A server *must* perform the sequence
 
-1. [**`socket()`**](#socket())
-2. [**`bind()`**](#bind())
-3. [**`listen()`**](#listen())
-4. [**`accept()`**](#accept()) (possibly repeating the `accept()` to service more than one client)
+1. [**`socket()`**](#socket)
+2. [**`bind()`**](#bind)
+3. [**`listen()`**](#listen)
+4. [**`accept()`**](#accept) (possibly repeating the `accept()` to service more than one client)
 
 * **Note**: 1-3 may be replaced by [**`create_server()`**](#create_server)
 
@@ -184,10 +184,10 @@ A server *must* perform the sequence
 
 While a client only needs the sequence
 
-1. [**`socket()`**](#socket())
-2. [**`connect()`**](#connect()) or [**`connect_ex()`**](#connect_ex())
+1. [**`socket()`**](#socket)
+2. [**`connect()`**](#connect) or [**`connect_ex()`**](#connect_ex)
 
-* **Note**: 1-2 may be replaced by [**`create_connection()`**](#create_connection())
+* **Note**: 1-2 may be replaced by [**`create_connection()`**](#create_connection)
 
 [socket_data.py]((./chapter3/socket_data.py))
 
@@ -198,7 +198,7 @@ While a client only needs the sequence
 Status | Local Address (`laddr`) | Remote Address (`raddr`) |
 --- | --- | --- |
 Before `bind` | zero (`0.0.0.0:0`), no connection. | N/A
-After `bind` | ex. `0.0.0.0:8080` (everyone on IPv4 interface) <br> ex2. `127.0.0.1:8080` (localhost) <br> ex3. `192.168.1.246:8080` (public ip) <ul><li><b>ip</b>: your web server's ip</li><li><b>port</b>: your web server's port</li></ul>A TCP server (such as a web server process) <b><i>listens</b></i> on a local port. Here, the local address only controls who can connect to this port: everyone, or only connections from localhost. | N/A
+After `bind` | ex. `0.0.0.0:8080` (everyone on IPv4 interface) <br> ex2. `127.0.0.1:8080` (localhost) <br> ex3. `192.168.1.246:8080` (public ip) <ul><li><b>ip</b>: your web server's ip</li><li><b>port</b>: your web server's port</li></ul>A TCP server (such as a web server process) <b><i>listens</b></i> on a local port. Here, the local address only controls who can connect to this port - see [`bind()`](#bind). | N/A
 After `listen` | No change | N/A
 After `accept` | No change <br><br> `accept` returns a new socket to handle the connection while this one just keeps on listening. | N/A
 
@@ -450,8 +450,8 @@ These are the general socket methods we can use in both socket clients and serve
 
 **TCP communication**:
 
-* [**`send()`**](#send())
-* [**`recv()`**](#recv())
+* [**`send()`**](#send)
+* [**`recv()`**](#recv)
 
 **UDP communication**:
 
@@ -537,13 +537,13 @@ There’s actually 3 general ways in which this loop could work:
 
 ### Timeout Methods
 
-* [**`getdefaulttimeout()`**](#getdefaulttimout())
+* [**`getdefaulttimeout()`**](#getdefaulttimout)
 
-* [**`gettimeout()`**](#gettimout())
+* [**`gettimeout()`**](#gettimout)
 
-* [**`setdefaulttimeout()`**](#setdefaulttimout())
+* [**`setdefaulttimeout()`**](#setdefaulttimout)
 
-* [**`settimeout()`**](#settimout())
+* [**`settimeout()`**](#settimout)
 
 ### Timeouts and the `connect` method
 >
