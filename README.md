@@ -148,7 +148,7 @@ PING madeupnameblag (92.242.140.21): 56 data bytes
 * Because your ISP is hijacking your DNS queries.
 
 * They are trying to be "helpful" by redirecting requests for nonexistent domains to a white label service that provides search results and advertising, from which everyone but you gets a cut of the revenue.
-  * For example, searchassist.verizon.com
+  * For example, searchassist.verizon.com for me because my ISP is Verizon FiOS, and they run Verizon DNS servers for my router.
 
 * Your DNS instead should be returning error & failing the request. Fortunately, your ISP should have a preferences page where you can supposedly turn it off.
 * Another solution is to [consider using a 3rd party DNS service](https://www.howtogeek.com/167239/7-reasons-to-use-a-third-party-dns-service/).
