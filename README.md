@@ -107,9 +107,7 @@ Type | Constant | Notes
 
 ```python
 gethostname() -> str
-"""
-Return the current host name.
-"""
+"""Return the current host name."""
 ```
 
 You can get this value by running **`hostname`** in your console:
@@ -260,11 +258,11 @@ s.connect(("www.python.org", 80))
 # <... laddr=('192.168.1.246', 50679), raddr=('142.250.64.68', 80)>
 ```
 
-As discussed under [gethostbyname()](#gethostbyname()), `connect` will **not fail even if the host is not a real existing host** because of your ISPs DNS resolution. It will even allow you to `send` and `recv` data.
+As discussed under [gethostbyname()](#gethostbyname), `connect` will **not fail even if the host is not a real existing host** because of your ISPs DNS resolution. It will even allow you to `send` and `recv` data.
 
 * You can test this out by passing a random host to `target_host` in [socket_data.py](./chapter3/http_server/testing_http_server.py).
 
-However, **it will hang after `connect` until a timeout if the port is not accepting connections** (a random host will probably fail if you change your port from 80 to something non-standard).
+However, if the ***port* is not accepting connections, it will hang after `connect` until a timeout** (a random host will probably fail if you change your port from 80 to something non-standard).
 
 ### connect_ex()
 
