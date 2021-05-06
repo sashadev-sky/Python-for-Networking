@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-from socket import socket, gethostbyname
-import sys
-from datetime import datetime
-import errno
-from threading import *
 import optparse
+# import sys
+from datetime import datetime
+from socket import gethostbyname, socket
+# import errno
+from threading import *
+import time
 
 
 def socket_scan(host, port):
@@ -21,7 +22,6 @@ def socket_scan(host, port):
 		socket_connect.close()
 
 def port_scanning(host: str, ports: list, is_range: bool):
-	time_init = datetime.now()
 	try:
 		ip = gethostbyname(host)
 		print('[+] Scan Results for: ' + ip)
@@ -30,23 +30,27 @@ def port_scanning(host: str, ports: list, is_range: bool):
 		return
 
 	if is_range:
-		ports = range(int(ports[0]), int(ports[1]))
+		ports = range(int(ports[0]), int(ports[-1]) + 1)
+	time_init, threads = datetime.now(), []
 	for port in ports:
 		t = Thread(target=socket_scan, args=(ip, int(port)))
 		t.start()
+		threads.append(t)
 
-	time_finish = datetime.now()
-	total = time_finish - time_init
+	for t in threads:
+		t.join()
+	print(ports)
+	total = (datetime.now() - time_init)
 	print('Port Scanning Completed in: ', total)
 
 
 def main():
-	parser = optparse.OptionParser('socket_portScan ' + '-H <Host> -P <Port>')
-	parser.add_option('-H', dest='host', type='string', help='specify host')
-	parser.add_option('-P', dest='port', type='string',
+	parser = optparse.OptionParser('socket_ports_open.py ' + '-H [hostname] -p [port[s]]')
+	parser.add_option('-H', "--host", dest='host', type='string', help='specify host')
+	parser.add_option('-p', "--port", dest='port', type='string',
 	                  help='specify port[s] separated by comma')
-	parser.add_option('-R', default=False, dest='is_range', type='string',
-	                  help='specify specified ports as a range')
+	parser.add_option('-r', action="store_true", default=False, dest='is_range',
+	                  help='specify port numbers as a range: lo,hi [inclusive]')
 
 	(options, _) = parser.parse_args()
 
