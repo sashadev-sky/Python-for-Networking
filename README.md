@@ -153,6 +153,22 @@ PING madeupnameblag (92.242.140.21): 56 data bytes
 * Your DNS instead should be returning error & failing the request. Fortunately, your ISP should have a preferences page where you can supposedly turn it off.
 * Another solution is to [consider using a 3rd party DNS service](https://www.howtogeek.com/167239/7-reasons-to-use-a-third-party-dns-service/).
 
+**Note**: I fixed this problem by configuring my router to use a 3rd party DNS service. I selected **Cloudflare's 1.1.1.1** on the basis of speed and privacy.
+
+Now I get the desired result for an unknown host:
+
+```bash
+$ ping madeupnameblag
+ping: cannot resolve madeupnameblag: Unknown host
+```
+
+and in Python, am able to throw a **`socket.gaierror`**:
+
+```python
+gethostbyname('madeupnameblag')
+socket.gaierror: [Errno 8] nodename nor servname provided, or not known
+```
+
 ### gethostbyaddr()
 
 #### Reverse resolution
