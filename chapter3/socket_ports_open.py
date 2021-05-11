@@ -1,20 +1,16 @@
 #!/usr/bin/env python3
 
 import optparse
-from socket import gethostbyname, socket
+from socket import gethostbyname, socket, create_connection
 import time
 from threading import *
 
 def socket_scan(host, port):
 	try:
-		socket_connect = socket()
-		socket_connect.settimeout(5)
-		socket_connect.connect((host, port))
-		print('[+] %d/tcp open' % port)
+		with create_connection((host, port), timeout=5):
+			print('[+] %d/tcp open' % port)
 	except Exception as exception:
 		print('[-] %d/tcp closed\n[-] Reason: %s' % (port, exception))
-	finally:
-		socket_connect.close()
 
 def port_scanning(host: str, ports: list, is_range: bool):
 	try:
@@ -75,7 +71,7 @@ $ p3 socket_ports_open.py -H localhost -p 80,83 -r
 [-] 83/tcp closed
 [-] Reason: [Errno 61] Connection refused
 
-time elapsed: 0.00s
+time elapsed: 0.01s
 
 With a remote host:
 $ p3 socket_ports_open.py -H 172.217.168.164 -p 80,83
