@@ -4,7 +4,7 @@
 
 ### TCP vs. HTTP
 
->TCP is to HTTP as gasoline is to cars.
+> TCP is to HTTP as gasoline is to cars. The **HTTP protocol** uses sockets at a low level to establish a client-server connection.
 
 Ex. while i'm on stackoverflow in my browser and run `$ netstat`:
 
@@ -266,6 +266,8 @@ The default socket is a TCP socket using IPV4:
 # Equivalent to socket(family=AF_INET, type=SOCK_STREAM, proto=0)
 ss = socket()  # <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('0.0.0.0', 0)>
 ```
+
+* **Note**: we have to use the same socket type for the client and the server when we are building applications oriented to passing messages with sockets.
 
 ## Basic socket client
 

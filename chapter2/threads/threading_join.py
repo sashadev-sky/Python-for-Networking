@@ -19,7 +19,7 @@ def test():
         thread = thread_message("I am the "+str(num)+" thread")
         thread.start()
         threads.append(thread)
-    #  wait for all threads to complete by entering them
+    # Wait for all threads to complete by entering them
     for thread in threads:
         thread.join()
 
