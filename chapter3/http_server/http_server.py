@@ -49,9 +49,10 @@ with create_server(('localhost', 8080)) as serversocket:
         # handle new connection
         with clientsocket:
             print('Connected by', clientaddr)  # Connected by ('127.0.0.1', 56416)
-            print(f'HTTP request received: {clientsocket.recv(1024)}')  # b'GET / HTTP/1.1\r\nHost: localhost\r\n\r\n'
-            clientsocket.send(bytes(
-                "HTTP/1.1 200 OK\r\n\r\n <html><body><h1>Hello World!</h1></body></html> \r\n", 'utf-8'))
+            data = clientsocket.recv(1024).decode()
+            print(f'HTTP request received: {data}')  # b'GET / HTTP/1.1\r\nHost: localhost\r\n\r\n'
+            res = "HTTP/1.1 200 OK\r\n\r\n <html><body><h1>Hello World!</h1></body></html> \r\n"
+            clientsocket.send(res.encode())
 
 """
 $ p3 http_server.py

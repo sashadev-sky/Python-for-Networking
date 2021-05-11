@@ -271,10 +271,10 @@ ss = socket()  # <socket.socket fd=3, family=AddressFamily.AF_INET, type=SocketK
 
 > **Normally, the *connecting* socket starts the conversation, by sending in a request**, or perhaps a signon. But that’s a design decision - it’s not a rule of sockets.
 
-1) When the **`connect`** completes
-2) The socket can be used to **`send`** in a request for the text of the page.
-3) The same socket will read the reply (**`recv`**)
-4) And then be destroyed (**`close`**).
+1. When the **`connect`** completes
+2. The socket can be used to **`send`** in a **request** for the text of the page.
+3. The same socket will read the reply (**`recv`**)
+4. And then be destroyed (**`close`**).
     * That’s right, destroyed. Client sockets are normally only used for one exchange (or a small set of sequential exchanges - like the multiple commands we send from a command struct to the `watchout_client`).
 
 **[socket_data.py](./chapter3/http_server/testing_http_server.py)**
@@ -328,7 +328,7 @@ create_connection: (addr: Tuple[str | None, int], timeout: float | None, source_
 
 ## HTTP socket server
 
-After marking our socket as a "server" socket with `listen`, we enter the mainloop of the server.
+After marking our socket as a "server" socket with **`listen`**, we enter the mainloop of the server.
 Here, we are establishing the logic of our server every time it receives a request from a client:
 
 1) **`accept`** the connection
@@ -375,21 +375,21 @@ bind(addr: tuple[str, int]) -> None
 
 **For host, passing**:
 
-1) 'localhost' means only localhost (this machine) can connect to this port
+1. 'localhost' means only localhost (this machine) can connect to this port
 
 ```python
 ss.bind(('localhost', 8080))
 # <... laddr=('127.0.0.1', 8080)>
 ```
 
-2) '' makes the port available to connect for everyone
+2. '' makes the port available to connect for everyone
 
 ```python
 ss.bind(('', 8080))
 # <... laddr=('0.0.0.0', 8080)>
 ```
 
-3) A specific IP address, as resolved from the result of **`gethostname()`**, will only accept connections to the associated interface. (A connection made must be made to the resolved IP)
+3. A specific IP address, as resolved from the result of **`gethostname()`**, will only accept connections to the associated interface. (A connection made must be made to the resolved IP)
 
 ```python
 ss.bind((gethostname(), 8080))
@@ -398,14 +398,14 @@ ss.bind((gethostname(), 8080))
 
 **For port, passing**:
 
-1) 0 selects an arbitrary unused port
+1. 0 selects an arbitrary unused port
 
 ```python
 ss.bind(('localhost', 0))
 # <.... laddr=('127.0.0.1', 61510)>
 ```
 
-2) Any other existing port value selects that port
+2. Any other existing port value selects that port
 
 ### `listen`
 
@@ -459,14 +459,10 @@ ss = create_server(('localhost', 8080))
 
 ```python
 accept() -> tuple[clientsocket, clientaddr]
-"""Accept connection, returning new socket fd and client address.
-
-Blocks and waits for an incoming connection.
-
-Enables us to accept client connections and returns a tuple with
-two values that represent client_socket and client_address.
-"""
+"""Accept connection, returning new socket fd and client address."""
 ```
+
+* **Note**: Blocks and waits for an incoming connection.
 
 For example: I've started a `python3 -m http.server` on localhost port 7001:
 
@@ -501,10 +497,10 @@ These are the general socket methods we can use in both socket clients and serve
 
 **UDP communication**:
 
-* **`sendto(data, addr)`**: Sends data to a given address.
-* **`recvfrom(bufsize)`**: This method receives data and the sender's address.
+* **`sendto()`**: Sends data to a given address.
+* **`recvfrom()`**: This method receives data and the sender's address.
 
-### send()
+### `send`
 
 ```python
 send(data: bytes) -> bytes
@@ -513,13 +509,13 @@ send(data: bytes) -> bytes
 
 Use **`encode`** to convert to bytes: `str.encode(encoding: str='UTF-8') -> bytes`
 
-### recv()
+* **Note**: while the socket client **`send`** s in a request, the server socket **`send`** s in a response to a request.
+
+### `recv`
 
 ```python
 recv(bufsize: int) -> bytes
 """Receive data from the socket.
-
-It is a blocking call - blocking if no data is waiting to be read.
 
 :param bufsize: the maximum amount of data it can receive.
 :return: bytes object representing the data received.
@@ -529,6 +525,8 @@ It is a blocking call - blocking if no data is waiting to be read.
 * Ex. `s.recv(1024)` will read at most 1024 bytes.
 
 * Note: for best match with hardware and network realities, the value of `bufsize` should be relatively small (commonly, power of 2), for example, 4096.
+
+* Note: blocking if no data is waiting to be read.
 
 Use **`decode`** to convert the `recv`'d data from bytes when you know the encoding: `bytes.decode(encoding: str='UTF-8') -> str`
 
