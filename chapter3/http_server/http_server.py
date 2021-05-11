@@ -1,32 +1,24 @@
 #!/usr/bin/env python3
 
+from socket import create_server, socket
 
-from socket import (SO_REUSEPORT, SOL_SOCKET,
-                    create_server, socket)
-
-# ss = socket()
 
 """
-To set a socket option do it right before `bind`:
-    `ss.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)`
-"""
+1. Classic Implementation
 
-# ss.bind(('localhost', 8080))
+`ss = socket()
+`ss.bind(('localhost', 8080))
+`ss.listen()
 
-# ss.listen()
-
-"""
 The resulting socket obj created:
     - does not have 'timeout' enabled (-> None) ('timeout' attribute or 'gettimeout()' method)
     - 'socket.SO_REUSEADDR' is set to 4 (Remote Port)
     - 'socket.SO_REUSEPORT' is set to 512
     - 'ss.fileno()' -> 4
-    - 'ss.family' -> <AddressFamily.AF_INET: 2>
-    - 'ss.type' -> <SocketKind.SOCK_STREAM: 1>
 """
 
 """
-* Alterantive way: 'create_server'
+2. Alterantive Implementation: 'create_server'
 """
 
 # with create_server(('localhost', 8080)) as serversocket:
@@ -41,8 +33,9 @@ The resulting socket obj created:
     #         "HTTP/1.1 200 OK\r\n\r\n <html><body><h1>Hello World!</h1></body></html> \r\n", 'utf-8'))
     #     clientsocket.close()
 
+
 """
-Refactored a 3rd time - use a client context manager too
+3. Alternative Implementation Refactored: Use a client context manager too
 """
 
 with create_server(('localhost', 8080)) as serversocket:
