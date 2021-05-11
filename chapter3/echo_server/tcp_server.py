@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from socket import socket, create_server
-import threading
 
 SERVER_IP, SERVER_PORT   = '127.0.0.1', 9998
 
