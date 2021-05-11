@@ -69,14 +69,6 @@ Python's `socket` module provides an interface to the Berkeley sockets API.
 
 It exposes all of the necessary methods to quickly write TCP and UDP clients and servers for writing low-level network applications. There are higher-level Python APIs such as `Twisted` that might be better suited.
 
-Things well need:
-
-```python
-from socket import (AF_INET, SO_REUSEPORT, SOCK_STREAM, SOL_SOCKET,
-                    SOMAXCONN, create_server, create_connection, socket,
-                    getdefaulttimeout, setdefaulttimout)
-```
-
 ### Type
 
 Based on the **communication type**, sockets are classified as follows:
@@ -97,93 +89,124 @@ Type | Constant | Notes
 
 ## Socket Methods
 
+* [**`getaddrinfo()`**](#getaddrinfo)
+
+* [**`getfqdn()`**](#getfqdn)
+
 * [**`gethostname()`**](#gethostname)
 
 * [**`gethostbyname()`**](#gethostbyname)
 
+* [**`gethostbyname_ex()`**](#gethostbyname_ex)
+
 * [**`gethostbyaddr()`**](#gethostbyaddr)
 
-### gethostname()
+[socket_methods.py](./chapter3/socket_methods.py)
+
+### `getaddrinfo`
+
+```python
+getaddrinfo(host, port, family=0, type=0, proto=0, flags=0) -> list[tuple[family, type, proto, canonname, sockaddr]]
+"""Translate the host/port argument into a sequence of 5-tuples that contain all the necessary arguments for creating a socket connected to that service.
+
+:param host: a domain name, a string representation of an IPv4/v6 address or None.
+:param port: a string service name such as 'http', a numeric port number or None.
+"""
+```
+
+### `getfqdn`
+
+```python
+getfqdn([name]) -> str
+"""Return a fully qualified domain name for name. If name is omitted or empty, it is interpreted as the local host."""
+```
+
+* **Note**: To find the fully qualified name, the hostname returned by `gethostbyaddr()` is checked, followed by aliases for the host, if available. The first name which includes a period is selected. In case no fully qualified domain name is available, the hostname as returned by `gethostname()` is returned.
+
+### `gethostname`
 
 ```python
 gethostname() -> str
-"""Return the current host name."""
+"""Return the current hostname of the machinne where the Python interpreter is currently executing."""
 ```
 
-You can get this value by running **`hostname`** in your console:
+* **Note**: `gethostname()` doesn’t always return the **fully qualified domain name**; use **[`getfqdn()`](#getfqdn)** for that.
 
-```bash
-$ hostname
-Locals-MBP.fios-router.home
+The **hostname** is just the computer name. Alternative ways to retrieve this value:
+
+```python
+# Bash
+$ hostname  # MacingtonProlll.fios-router.home
+
+# Python
+import platform
+platform.node()  # MacingtonProlll.fios-router.home
 ```
 
 #### **Direct DNS Resolution**
 
-> When binding a socket to listen to `hostname`, it will in turn be resolved to an IP address.
+> When binding a socket to listen to a host name, it will in turn be resolved to an IP address.
 
-### gethostbyname()
+### `gethostbyname`
 
 ```python
 gethostbyname(hostname: str) -> str
-"""Return the IP address(a string of the form '255.255.255.255') for a host."""
+"""Return the IPv4 address(a string of the form '255.255.255.255') for a host."""
 ```
 
 You can get this value by running **`ping <hostname>`** in your console:
 
 ```bash
-$ ping Locals-MBP.fios-router.home
-PING locals-mbp.fios-router.home (192.168.1.246): 56 data bytes
-
-$ ping www.google.com
-PING www.google.com (172.217.3.100): 56 data bytes
+$ ping macingtonprolll.fios-router.home  # PING macingtonprolll.fios-router.home (192.168.1.155): 56 data bytes
+$ ping www.google.com  # PING www.google.com (172.217.3.100): 56 data bytes
 ```
 
-#### Why is `ping` and `gethostbyname` resolving to an IP 92.242.140.21 for any random hostname that I type?
+#### *Why is `ping` and `gethostbyname` resolving to an IP 92.242.140.21 for any random hostname that I type?*
 
 ```bash
-$ ping madeupnameblag
-PING madeupnameblag (92.242.140.21): 56 data bytes
+$ ping madeupnameblag  # PING madeupnameblag (92.242.140.21): 56 data bytes
 ```
 
-* Because your ISP is hijacking your DNS queries.
-
-* They are trying to be "helpful" by redirecting requests for nonexistent domains to a white label service that provides search results and advertising, from which everyone but you gets a cut of the revenue.
+* Because your ISP is **hijacking** your DNS queries. They are trying to be "helpful" by redirecting requests for nonexistent domains to a white label service that provides search results and advertising, from which everyone but you gets a cut of the revenue.
   * For example, searchassist.verizon.com for me because my ISP is Verizon FiOS, and they run Verizon DNS servers for my router.
 
-* Your DNS instead should be returning error & failing the request. Fortunately, your ISP should have a preferences page where you can supposedly turn it off.
-* Another solution is to [consider using a 3rd party DNS service](https://www.howtogeek.com/167239/7-reasons-to-use-a-third-party-dns-service/).
+* Your DNS instead should be returning error & failing the request. Your ISP should have a preferences page where you can supposedly turn it off. Another solution is to [consider using a 3rd party DNS service](https://www.howtogeek.com/167239/7-reasons-to-use-a-third-party-dns-service/).
 
-**Note**: I fixed this problem by configuring my router to use a 3rd party DNS service. I selected **Cloudflare's 1.1.1.1** on the basis of speed and privacy.
+**Note**: I fixed this problem by configuring my router to use a 3rd party DNS service. I selected **Cloudflare's 1.1.1.1** on the basis of speed and privacy. Now I get the desired result for an unknown host:
 
-Now I get the desired result for an unknown host:
+```Bash
+# Bash
+$ ping madeupnameblag  # ping: cannot resolve madeupnameblag: Unknown host
 
-```bash
-$ ping madeupnameblag
-ping: cannot resolve madeupnameblag: Unknown host
+# Python
+gethostbyname('madeupnameblag')  # socket.gaierror: [Errno 8] nodename nor servname provided, or not known
 ```
 
-and in Python, am able to throw a **`socket.gaierror`**:
+### `gethostbyname_ex`
 
 ```python
-gethostbyname('madeupnameblag')
-socket.gaierror: [Errno 8] nodename nor servname provided, or not known
+gethostbyname_ex(hostname: str) -> (name, alias: list, address: list)
+"""Extended interface for gethostbyname"""
 ```
 
-### gethostbyaddr()
+* **Note**: `gethostbyname()` and `gethostbyname_ex()` do not support IPv6 name resolution, and **`getaddrinfo()`** should be used instead for IPv4/v6 dual stack support.
+
+### `gethostbyaddr`
+
+```python
+gethostbyaddr(hostname: str) -> (name, alias: list, address: list)
+"""Return the true host name, a list of aliases, and a list of IP addresses, for a host."""
+```
+
+* **Note**: "True host name" refers to the primary name by which the host at that IP address would like to be known. It is not necessarily the fully qualified hostname.
+
+* **Note**: Supports both IPv4 and IPv6.
 
 #### Reverse resolution
 
 > Allows us to associate a domain name with a specific IP address.
 
-```python
-gethostbyaddr(host: str) -> (name, alias: list, address: list)
-"""Return the true host name, a list of aliases, and a list of IP addresses, for a host.
-
-:param host: host name or IP number
-"""
-```
-
-### Creating a Socket
+## Creating a Socket
 
 A server *must* perform the sequence
 
@@ -617,10 +640,6 @@ getdefaulttimeout() -> float | None
 ```
 
 **Note**: When the socket module is first imported, the default is None, meaning newly created socket objects have no timeout.
-
-```python
-getdefaulttimeout()  # None
-```
 
 ### `setdefaulttimeout()`
 

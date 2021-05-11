@@ -36,7 +36,7 @@ the filesystem of another machine, we could build our
 own reverse shell in Python.
 
 In one terminal tab:
-$ nc -lv 127.0.0.1 45679 -e /bin/sh
+$ sudo nc -lv 127.0.0.1 45679
 
 In another:
 $ p3 reverse_shell.py

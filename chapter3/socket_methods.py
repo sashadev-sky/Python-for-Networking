@@ -1,55 +1,44 @@
 #!/usr/bin/python
 
-from socket import (socket, gethostname, gethostbyname, gethostbyaddr,
+from socket import (gethostname, gethostbyname, gethostbyaddr,
                     getfqdn, getaddrinfo, gethostbyname_ex, SOCK_STREAM)
 
-try:
-    # Return the current host name.
-    print("gethostname:", gethostname())
-    # Return the IP address(a string of the form '255.255.255.255') for a host.
-    print("gethostbyname:", gethostbyname('Locals-MBP.fios-router.home'))
-    # Return the true host name, a list of aliases, and a list of IP addresses, for a host.
-    print("gethostbyname_ex:", gethostbyname_ex('Locals-MBP.fios-router.home'))
-    print("gethostbyaddr", gethostbyaddr('192.168.1.246'))
-    print("gethostbyname:", gethostbyname('blahnotreal'))
-    print("gethostbyname_ex:", gethostbyname_ex('blahnotreal'))
-    print("gethostbyaddr", gethostbyaddr('blahnotreal'))
-    print("gethostbyaddr", gethostbyaddr('92.242.140.21'))
-    print("gethostbyname", gethostbyname('www.google.com'))
-    print("gethostbyname_ex", gethostbyname_ex('www.google.com'))
-    # gethostbyname_ex() does not support IPv6 name resolution,
-    # and getaddrinfo() should be used instead for IPv4/v6 dual stack support.
-    print("gethostbyaddr", gethostbyaddr('8.8.8.8'))
-    print("getfqdn", getfqdn('www.google.com'))
-    print("getaddrinfo", getaddrinfo(
-        "www.google.com", None, 0, SOCK_STREAM))
+hostnames = [gethostname(), 'www.google.com']
 
-except socket.error as error:
-    print(str(error))
-    print("Connection error")
+for host in hostnames:
+    # Get the primary, fully qualified domain name and IP address
+    name = getfqdn(host)
+    addr = gethostbyname(name)
+    print('\nhostname:', host, '\nfqdn:', name, '\naddr:', addr, '\n')
+
+    # Might have other names and addresses, and if you want to find out about them, you can do the following:
+    the_name, aliases, addresses = gethostbyaddr(addr)
+    print('Primary name for %s (%s): %s' % (host, addr, the_name))
+    for alias in aliases: print('AKA', alias)
+    for address in addresses: print('address:', address)
+
+    print('\ngetaddrinfo', f'{host}:', getaddrinfo(host, None, type=SOCK_STREAM))
 
 """
 $ p3 socket_methods.py
-gethostname: Locals-MBP.fios-router.home
 
-### Locals-MBP.fios-router.home ###
+hostname: MacingtonProlll.fios-router.home
+fqdn: macingtonprolll.fios-router.home
+addr: 192.168.1.155
 
-gethostbyname: 192.168.1.246
-gethostbyname_ex: ('locals-mbp.fios-router.home', [], ['192.168.1.246'])
-gethostbyaddr ('locals-mbp.fios-router.home', ['246.1.168.192.in-addr.arpa'], ['192.168.1.246'])
+Primary name for MacingtonProlll.fios-router.home (192.168.1.155): macingtonprolll.fios-router.home
+AKA 155.1.168.192.in-addr.arpa
+address: 192.168.1.155
 
-### blahnotreal ###
+getaddrinfo MacingtonProlll.fios-router.home: [(<AddressFamily.AF_INET: 2>, <SocketKind.SOCK_STREAM: 1>, 6, '', ('192.168.1.155', 0))]
 
-gethostbyname: 92.242.140.21
-gethostbyname_ex: ('blahnotreal', [], ['92.242.140.21'])
-gethostbyaddr ('unallocated.barefruit.co.uk', ['21.140.242.92.in-addr.arpa'], ['92.242.140.21'])
+hostname: www.google.com
+fqdn: lga34s18-in-f4.1e100.net
+addr: 172.217.3.100
 
-### www.google.com ###
+Primary name for www.google.com (172.217.3.100): lga34s18-in-f4.1e100.net
+AKA 100.3.217.172.in-addr.arpa
+address: 172.217.3.100
 
-gethostbyname 172.217.165.132
-gethostbyname_ex ('www.google.com', [], ['172.217.165.132'])
-gethostbyaddr ('dns.google', ['8.8.8.8.in-addr.arpa'], ['8.8.8.8'])
-
-getfqdn lga25s70-in-f4.1e100.net
-getaddrinfo [(<AddressFamily.AF_INET: 2>, <SocketKind.SOCK_STREAM: 1>, 6, '', ('172.217.165.132', 0))]
+getaddrinfo www.google.com: [(<AddressFamily.AF_INET: 2>, <SocketKind.SOCK_STREAM: 1>, 6, '', ('172.217.3.100', 0))]
 """
