@@ -1,4 +1,6 @@
-# Network Programming
+# Network Programming - Sockets
+
+See also [Network Programming - HTTP](./NETWORK_HTTP.md)
 
 ## Concepts
 
@@ -350,7 +352,7 @@ while True:
 There’s actually 3 general ways in which this loop could work:
 
 1. Dispatching a **`thread`** to handle clientsocket
-2. Create a new **`process`** to handle clientsocket
+2. Create a new **`process`**  (also known as a **fork**) to handle clientsocket
 3. Restructure this app to use non-blocking sockets, and multiplex between our “server” socket and any active "client" sockets using select.
 
 #### The important thing to understand: this is all a “server” socket does.

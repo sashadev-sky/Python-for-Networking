@@ -3,7 +3,7 @@ from thread_worker import ThreadWorker
 
 
 def main():
-    # This initializes ''thread'' as an instance of our Thread Worker
+    # This initializes 'thread' as an instance of our Thread Worker
    thread = ThreadWorker()
    # This is the code needed to run our created thread
    thread.start()
