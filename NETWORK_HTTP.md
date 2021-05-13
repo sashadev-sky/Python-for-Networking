@@ -50,14 +50,37 @@ A wrapper of `urllib.request`, along with other Python modules to provide the RE
 ## asyncio
 
 ---
+Asynchronous IO Support.
+
+**Write explicitly asynchronous, concurrent Python code.**
+
+ `asyncio` offers a safer alternative to **preemptive multitasking** (**threading**) - it will be much easier for you to avoid race condition bugs with Asyncio.
+
+ Also offers large-scale concurrency - provides a simple way to support thousands of simultaneous socket connections.
 
 ### Preface
 
 ---
 
-**Event loop**: The event loop is the core of every asyncio application. Event loops run asynchronous tasks and callbacks, perform network IO operations, and run subprocesses.
+### **Event loop**
+
+The event loop is the core of every asyncio application. Event loops run asynchronous tasks and callbacks concurrently, perform network IO operations, and run subprocesses.
+
+> Fundamentally, waits for some events to happen and executes handlers associated with those events. In the case of AsyncIO, these **handlers are coroutines**.
+
+* They inherit from the `BaseEventLoop` abstract class, which contains several methods used to execute asynchronous code.
 
 Application developers should typically use the high-level asyncio functions, such as **`asyncio.run()`**, and should rarely need to reference the loop object or call its methods.
+
+### Coroutine
+
+**Coroutines** are a more generalized form of **subroutines**
+
+> **Subroutines** are entered at one point and exited at another point. **Coroutines** can be entered, exited, and resumed at many different points. They can be implemented with the **`async def`** statement.
+
+```python
+async def func_name() -> Coroutine:
+```
 
 ### Low-level
 
@@ -105,7 +128,9 @@ run_until_complete(future: Awaitable)
 
 Run until the future has completed.
 
-If the argument is a coroutine object it is implicitly scheduled to run as a **`asyncio.Task`**.
+If the argument is a **coroutine** object it is implicitly scheduled to run as a **`asyncio.Task`**:
+
+1. task is created and the coroutine is associated with it.
 
 ### `run_forever`
 
