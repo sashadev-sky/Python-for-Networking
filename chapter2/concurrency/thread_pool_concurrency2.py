@@ -1,15 +1,15 @@
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor as Executor
 
 
 def message(message):
  print(f'Processing {message}')
 
 def main():
- print("Starting ThreadPoolExecutor")
- with ThreadPoolExecutor(max_workers=2) as executor:
-   executor.submit(message, ('message 1'))
-   executor.submit(message, ('message 2'))
- print("All tasks complete")
+    print('Starting ThreadPoolExecutor')
+    with Executor(max_workers=2) as exe:
+        fut1 = exe.submit(message, ('message 1'))
+        fut2 = exe.submit(message, ('message 2'))
+    print('All tasks complete')
 
 
 if __name__ == '__main__':

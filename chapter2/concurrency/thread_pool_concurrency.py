@@ -1,4 +1,4 @@
-#python 3
+#!/usr/bin/env python3
 from concurrent.futures import ThreadPoolExecutor as Executor
 import threading
 
@@ -11,7 +11,6 @@ def view_thread_worker():
 
 def main():
     with Executor(max_workers=3) as exe:
-        print(exe)
         fut1 = exe.submit(view_thread_worker)
         fut2 = exe.submit(view_thread_worker)
         fut3 = exe.submit(view_thread_worker)
