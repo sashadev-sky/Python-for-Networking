@@ -1,10 +1,10 @@
-import threading
+from threading import Thread
 
 
-class ThreadWorker(threading.Thread):
-
-    # Our workers constructor
+class ThreadWorker(Thread):
     def __init__(self):
+        """Our workers constructor"""
+
         super(ThreadWorker, self).__init__()
 
     def run(self):

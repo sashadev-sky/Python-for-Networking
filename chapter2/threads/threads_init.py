@@ -1,5 +1,5 @@
-import threading
-import time
+from threading import Thread
+from time import sleep
 
 num_threads = 4
 
@@ -12,8 +12,8 @@ def thread_message(message):
 
 while num_threads > 0:
 	print("I am the %s thread" % num_threads)
-	threading.Thread(target=thread_message("I am the %s thread" % num_threads)).start()
-	time.sleep(0.1)
+	Thread(target=thread_message("I am the %s thread" % num_threads)).start()
+	sleep(0.1)
 
 
 """
@@ -29,16 +29,4 @@ Message from thread I am the 2 thread
 
 I am the 1 thread
 Message from thread I am the 1 thread
-
-start(self)
-
-|            Start the thread’s activity.
-
-|            It must be called at most once per thread object. It arranges for the
-
-|            object’s run() method to be invoked in a separate thread of control.
-
-|            This method will raise a RuntimeError if called more than once on the
-
-|            same thread object.
 """

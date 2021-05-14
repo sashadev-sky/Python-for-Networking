@@ -1,21 +1,20 @@
-import threading
+from threading import Thread
 
 
-class MyThread(threading.Thread):
+class MyThread(Thread):
 
     def __init__(self, message):
-        threading.Thread.__init__(self)
+        Thread.__init__(self)
         self.message = message
 
-    def run(self):
-        print(self.message)
+    def run(self): print(self.message)
 
 
 def test():
     for num in range(0, 10):
-        thread = MyThread("I am the "+str(num)+" thread")
-        thread.name = num
-        thread.start()
+        t = MyThread(f'thread {num}')
+        t.name = num
+        t.start()
 
 
 if __name__ == '__main__':

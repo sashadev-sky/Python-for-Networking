@@ -8,6 +8,8 @@ Asyncio is the Python asynchronous API
 
 * Note: **Threading** is also concurrent programming, but has a [different model](./Threads.md).
 
+> **Think: Multithreading is about *workers*, Asynchronous is about *tasks*.**
+
 ## What Problem Is Asyncio Trying to Solve?
 
 **For I/O-bound workloads, there are exactly (only!) two reasons to use async-based concurrency over thread-based concurrency:**

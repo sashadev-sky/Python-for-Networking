@@ -6,10 +6,9 @@ for bot in bots:
     # We get the number of tables as a command-line parameter, and then
     # give each bot that number of tasks for preparing and clearing tables in the restaurant.
     # for i in range(int(sys.argv[1])):
-    for i in range(100):
+    for i in range(10):
         bot.tasks.put('prepare table')
         bot.tasks.put('clear table')
-
     # The shutdown task will make the bots stop(so that bot.join()
     # a bit further down will return).
     bot.tasks.put('shutdown')
@@ -36,11 +35,9 @@ This script is showing why threading is considered unsafe.
 Testing this script:
   * If you run a bunch of ThreadBots over a bunch of tables a specific number of times,
     you expect that after all the work is done, all of the knives and forks should be back
-    in the kitchen and accounted for.If you run a bunch of ThreadBots over a bunch of
-    tables a specific number of times, you expect that after all the work is done,
-    all of the knives and forks should be back in the kitchen and accounted for.
+    in the kitchen and accounted for.
 
-  * Test that with one hundred tables to be prepared and cleared by each ThreadBot and all 
+  * Test that with one hundred tables to be prepared and cleared by each ThreadBot and all
     of them operating at the same time:
 
     $ p3 cutlery.py 100

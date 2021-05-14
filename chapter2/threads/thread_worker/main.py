@@ -1,12 +1,9 @@
-import threading
 from thread_worker import ThreadWorker
 
 
 def main():
-    # This initializes 'thread' as an instance of our Thread Worker
-   thread = ThreadWorker()
-   # This is the code needed to run our created thread
-   thread.start()
+   t = ThreadWorker()  # initializes 'thread' as an instance of our ThreadWorker
+   t.start()   # run our created thread
 
 
 if __name__ == "__main__":
